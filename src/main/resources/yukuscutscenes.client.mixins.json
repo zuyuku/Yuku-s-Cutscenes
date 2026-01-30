@@ -1,0 +1,16 @@
+{
+	"required": true,
+	"package": "zuyuku.yukuscutscenes.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"MouseMixin",
+		"CameraMixin",
+		"KeyboardMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

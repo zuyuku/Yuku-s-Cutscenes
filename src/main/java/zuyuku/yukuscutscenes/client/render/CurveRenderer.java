@@ -1,0 +1,102 @@
+package zuyuku.yukuscutscenes.client.render;
+
+import static zuyuku.yukuscutscenes.client.Client.MC;
+
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Vec3d;
+import zuyuku.yukuscutscenes.YukusCutscenes;
+import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
+import zuyuku.yukuscutscenes.util.Cutscene;
+import zuyuku.yukuscutscenes.util.CutsceneManager;
+import zuyuku.yukuscutscenes.util.CutscenePayload;
+import zuyuku.yukuscutscenes.util.LerpType;
+import zuyuku.yukuscutscenes.util.bezier.BezierPoint;
+
+public class CurveRenderer implements ClientModInitializer {
+    public static ArrayList<Cutscene> cutscenes = new ArrayList<>();
+    public static BezierPoint storedPoint;
+    public static double storedDistance;
+
+    private void renderBeziers(WorldRenderContext context) {
+        if(MC.player.isHolding(YukusCutscenes.editorItem)){
+            for(Cutscene cutscene : cutscenes)
+                cutscene.render(context);
+            if(storedPoint != null) {
+                storedPoint.setPos(calculateNewPoint(MC.player));
+                if(storedPoint.isFirst())
+                    storedPoint.getPath().getClientCutscene().setInitRot(MC.player.getRotationClient());
+                if(storedPoint.isLast())
+                    storedPoint.getPath().getClientCutscene().setFinalRot(MC.player.getRotationClient());
+            }
+        }
+	}
+
+    public static void updateStoredDistance(double i) {
+        storedDistance += (i*0.25);
+    }
+
+    private Vec3d calculateNewPoint(LivingEntity user) {
+        double rotation = user.getRotationClient().x*-1;
+        double y = Math.sin(Math.toRadians(rotation))*storedDistance;
+
+        double hypot = Math.sqrt(Math.pow(storedDistance, 2) - Math.pow(y, 2));
+        double rotation2 = user.getRotationClient().y*-1;
+        double x = Math.sin(Math.toRadians(rotation2))*hypot;
+        double z = Math.cos(Math.toRadians(rotation2))*hypot;
+        return new Vec3d(x + user.getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(false)).x, y + user.getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(false)).y, z + user.getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(false)).z);
+    }
+
+    public static NbtCompound toNbt() {
+        NbtCompound nbt = new NbtCompound();
+        NbtList list = new NbtList();
+        for(Cutscene cutscene : cutscenes)
+            list.add(cutscene.toNbt());
+        nbt.put("CutsceneList", list);
+        return nbt;
+    }
+
+    @Override
+    public void onInitializeClient() {
+		WorldRenderEvents.AFTER_ENTITIES.register(this::renderBeziers);
+        ClientPlayConnectionEvents.JOIN.register((networkHandler, packetSender, client) -> {
+            NbtCompound nbt = new NbtCompound();
+            nbt.putBoolean("Request", true);
+            ClientPlayNetworking.send(new CutscenePayload(nbt));
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(CutscenePayload.ID, (payload, context) -> {
+            context.client().execute(() -> {
+                String name = payload.nbt().getString("PlayName", "NULLNULL");
+                if(!name.matches("NULLNULL")) {
+                    for(Cutscene cutscene : cutscenes)
+                        if(cutscene.getName().matches(name)) {
+                            Optional<UUID> uuidStart = payload.nbt().get("startPlayer", Uuids.INT_STREAM_CODEC);
+                            Optional<UUID> uuidEnd = payload.nbt().get("endPlayer", Uuids.INT_STREAM_CODEC);
+                            if(uuidStart.isPresent() && uuidEnd.isPresent())
+                                ClientCutsceneManager.queueCutsceneEntityOriginAndEnd(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidStart.get()), MC.world.getPlayerByUuid(uuidEnd.get()));
+                            else if(uuidStart.isPresent())
+                                ClientCutsceneManager.queueCutsceneEntityOrigin(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidStart.get()));
+                            else if(uuidEnd.isPresent())
+                                ClientCutsceneManager.queueCutsceneEntityEnd(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidEnd.get()));
+                            else    
+                                ClientCutsceneManager.queueCutscene(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0));
+                            return;
+                        }
+                }
+                cutscenes = CutsceneManager.makeList(payload.nbt());
+            });
+        });
+    }
+}
