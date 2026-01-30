@@ -25,16 +25,22 @@ public class BezierPoint {
         this.isTangent = isTangent;
     }
 
+    private boolean isSinglePoint() {
+        return this.path.isSinglePoint();
+    }
+
     public void setPos(Vec3d newPos) {
-        if(this.isTangent()) {
-            if(!this.path.isPointFirstOrLast(this.getRoot()))
-                this.getMirrorTangent().pos = this.getRoot().getPos().subtract(newPos.subtract(this.getRoot().getPos()));
-        } else {
-            ArrayList<BezierPoint> tangents = this.getTangents();
-            Vec3d offset = tangents.get(0).getPos().subtract(this.getPos());
-            tangents.get(0).pos = newPos.add(offset);
-            if(!this.isEnd())
-                tangents.get(1).pos = newPos.subtract(offset);
+        if(!this.isSinglePoint()) {
+            if(this.isTangent()) {
+                if(!this.path.isPointFirstOrLast(this.getRoot()))
+                    this.getMirrorTangent().pos = this.getRoot().getPos().subtract(newPos.subtract(this.getRoot().getPos()));
+            } else {
+                ArrayList<BezierPoint> tangents = this.getTangents();
+                Vec3d offset = tangents.get(0).getPos().subtract(this.getPos());
+                tangents.get(0).pos = newPos.add(offset);
+                if(!this.isEnd())
+                    tangents.get(1).pos = newPos.subtract(offset);
+            }
         }
         this.pos = newPos;
         for(BezierSpline spline : this.getSplines())
