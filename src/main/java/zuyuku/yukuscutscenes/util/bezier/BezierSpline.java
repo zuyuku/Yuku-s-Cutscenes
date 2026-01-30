@@ -30,6 +30,10 @@ public class BezierSpline {
         }
     }
 
+    public boolean isSinglePoint() {
+        return this.points.size()==1;
+    }
+
     public boolean containsPoint(BezierPoint point) {
         for(BezierPoint hasPoint : this.points)
             if(hasPoint == point)
@@ -68,10 +72,7 @@ public class BezierSpline {
     public BezierSpline(Vec3d initialPos, BezierPath owner) {
         this.path = owner;
         this.v1 = new BezierPoint(this, initialPos, false);
-        this.v1_tangent= new BezierPoint(this, initialPos.add(new Vec3d(-1,1,1)), true);
-        this.v2 = new BezierPoint(this, initialPos.add(new Vec3d(1,0,0)), false);
-        this.v2_tangent = new BezierPoint(this, v2.getPos().add(new Vec3d(1,1,1)), true);
-        points = List.of(v1,v1_tangent,v2_tangent,v2);
+        points = List.of(v1);
         updateCoeffs();
     }
 
@@ -115,13 +116,15 @@ public class BezierSpline {
     }
 
     public void updateCoeffs() {
+        if(this.isSinglePoint())
+            return;
         coeff1 = v1.getPos().multiply(-1).add(v1_tangent.getPos().multiply(3)).add(v2_tangent.getPos().multiply(-3)).add(v2.getPos());
         coeff2 = v1.getPos().multiply(3).add(v1_tangent.getPos().multiply(-6)).add(v2_tangent.getPos().multiply(3));
         coeff3 = v1.getPos().multiply(-3).add(v1_tangent.getPos().multiply(3));
     }
 
     public Vec3d lerp(double t) {
-        return coeff1.multiply(Math.pow(t, 3)).add(
+        return this.isSinglePoint() ? this.points.getFirst().getPos() : coeff1.multiply(Math.pow(t, 3)).add(
             coeff2.multiply(Math.pow(t, 2)).add(
                 coeff3.multiply(t).add(
                     v1.getPos()

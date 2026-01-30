@@ -22,6 +22,10 @@ public class BezierPath {
         this.updateLUT();
     }
 
+    public boolean isSinglePoint() {
+        return this.splines.size()==1 && this.splines.getFirst().isSinglePoint();
+    }
+
     public BezierPath withPlayerOrigin(PlayerEntity player) {
         BezierPath newPath = new BezierPath(Vec3d.ZERO);
         ArrayList<BezierSpline> tempSplines = new ArrayList<>();
@@ -147,6 +151,8 @@ public class BezierPath {
             points.removeFirst();
             points.removeFirst();
         }
+        if(splineCount==0)
+            splines.add(new BezierSpline(points.getFirst(), this));
         this.splines = splines;
         this.updateLUT();
     }

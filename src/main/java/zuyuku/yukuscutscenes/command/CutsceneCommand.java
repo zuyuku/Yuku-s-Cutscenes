@@ -43,6 +43,20 @@ public class CutsceneCommand implements ModInitializer {
                         CommandManager.literal("cutscene")
                         .requires(CommandManager.requirePermissionLevel(CommandManager.GAMEMASTERS_CHECK))
                         .then(
+                            CommandManager.literal("resetAll")
+                            .then(
+                                CommandManager.literal("confirm")
+                                .executes(context -> {
+                                    ServerCommandSource source = context.getSource();
+                                    CutsceneManager manager = CutsceneManager.getFromWorld(source.getWorld());
+                                    manager.setData(new NbtCompound());
+                                    manager.syncToClients(source.getWorld());
+                                    source.sendFeedback(() -> Text.literal("All cutscenes have been removed from world."), true);
+                                    return 1;
+                                })
+                            )
+                        )
+                        .then(
                             CommandManager.literal("add")
                             .then(
                                 CommandManager.argument("name", StringArgumentType.string())

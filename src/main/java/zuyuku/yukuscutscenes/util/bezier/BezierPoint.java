@@ -90,6 +90,8 @@ public class BezierPoint {
             GizmoDrawing.line(this.pos, this.getRoot().pos, ColorHelper.scaleAlpha(this.getColor(), 0.5f), 5);
         if(this.isHovered(MC.player))
             color = ColorHelper.fromFloats(1.0f, 1.0f, 1.0f, 1.0f);
+        if(this.path.isSinglePoint())
+            color = ColorHelper.fromFloats(1.0f, 0.0f, 1.0f, 0.0f);
         GizmoDrawing.box(new Box(this.pos.add(new Vec3d(size,size,size)), this.pos.subtract(new Vec3d(size,size,size))), DrawStyle.stroked(color), true);
     }
 
