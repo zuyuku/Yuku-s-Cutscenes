@@ -116,6 +116,27 @@ public class BezierPath {
     }
 
     public void removePoint(BezierPoint point) {
+        if(this.splines.size() == 1) {
+            BezierSpline spline = this.splines.getFirst();
+            if(spline.isSinglePoint()) 
+                for(Cutscene cutscene : CurveRenderer.cutscenes)
+                    if(cutscene.path == this) {
+                        CurveRenderer.cutscenes.remove(cutscene);
+                        return;
+                    }
+            if(point.isLast()) {
+                this.splines.set(0, new BezierSpline(spline.v1.getPos(), this));
+                for(Cutscene cutscene : CurveRenderer.cutscenes)
+                        if(cutscene.path == this)
+                            cutscene.setFinalRot(cutscene.getRotAt(0));
+            } else {
+                this.splines.set(0, new BezierSpline(spline.v2.getPos(), this));
+                for(Cutscene cutscene : CurveRenderer.cutscenes)
+                        if(cutscene.path == this)
+                            cutscene.setInitRot(cutscene.getRotAt(1));
+            }
+            return;
+        }
         for(BezierSpline spline : point.getSplines())
             this.splines.remove(spline);
         this.updateLUT();
