@@ -25,7 +25,7 @@ public class BezierPoint {
         this.isTangent = isTangent;
     }
 
-    private boolean isSinglePoint() {
+    public boolean isSinglePoint() {
         return this.path.isSinglePoint();
     }
 

@@ -78,7 +78,14 @@ public class BezierSpline {
 
     public BezierSpline(BezierPoint point, BezierPath owner, Vec3d newEnd) {
         this.path = owner;
-        if(point.isFirst()) {
+        if(point.isSinglePoint()) {
+            this.v1 = point;
+            this.v2 = new BezierPoint(this, newEnd, false);
+            Vec3d offset = v1.getPos().subtract(v2.getPos()).multiply(0.5);
+            this.v1_tangent= new BezierPoint(this, v1.getPos().subtract(offset), true);
+            this.v2_tangent = new BezierPoint(this, v1.getPos().subtract(offset), true);
+
+        } else if(point.isFirst()) {
             this.v2 = point;
             Vec3d offset = v2.getTangents().get(0).getPos().subtract(v2.getPos());
             this.v2_tangent = new BezierPoint(this, v2.getPos().subtract(offset), true);
