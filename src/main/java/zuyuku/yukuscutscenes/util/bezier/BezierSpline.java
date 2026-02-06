@@ -103,6 +103,25 @@ public class BezierSpline {
         this.path.updateLUT();
     }
 
+    public BezierSpline(BezierPoint point, BezierPath owner, PlayerEntity player, boolean startAtPlayer) {
+        this.path = owner;
+        if(startAtPlayer) {
+            this.v2 = point;
+            BezierPoint split = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
+            this.v2_tangent = split;
+            this.v1_tangent = split;
+            this.v1 = new BezierPoint(this, player.getEyePos(), false);
+        } else {
+            this.v1 = point;
+            BezierPoint split = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
+            this.v2_tangent = split;
+            this.v1_tangent = split;
+            this.v2 = new BezierPoint(this, player.getEyePos(), false);
+        }
+        points = List.of(v1,v1_tangent,v2_tangent,v2);
+        updateCoeffs();
+    }
+
     public BezierSpline(BezierPoint point, BezierPath owner, PlayerEntity player) {
         this.path = owner;
         if(point.isFirst()) {

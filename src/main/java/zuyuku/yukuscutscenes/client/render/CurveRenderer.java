@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import zuyuku.yukuscutscenes.YukusCutscenes;
 import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
 import zuyuku.yukuscutscenes.util.Cutscene;
@@ -84,14 +85,12 @@ public class CurveRenderer implements ClientModInitializer {
                         if(cutscene.getName().matches(name)) {
                             Optional<UUID> uuidStart = payload.nbt().get("startPlayer", Uuids.INT_STREAM_CODEC);
                             Optional<UUID> uuidEnd = payload.nbt().get("endPlayer", Uuids.INT_STREAM_CODEC);
-                            if(uuidStart.isPresent() && uuidEnd.isPresent())
-                                ClientCutsceneManager.queueCutsceneEntityOriginAndEnd(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidStart.get()), MC.world.getPlayerByUuid(uuidEnd.get()));
-                            else if(uuidStart.isPresent())
-                                ClientCutsceneManager.queueCutsceneEntityOrigin(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidStart.get()));
-                            else if(uuidEnd.isPresent())
-                                ClientCutsceneManager.queueCutsceneEntityEnd(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0), MC.world.getPlayerByUuid(uuidEnd.get()));
-                            else    
-                                ClientCutsceneManager.queueCutscene(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0));
+                            World world = MC.world;
+                            if(uuidStart.isPresent())
+                                cutscene = cutscene.originAtPlayer(world.getPlayerAnyDimension(uuidStart.get()));
+                            if(uuidEnd.isPresent())
+                                cutscene = cutscene.endAtPlayer(world.getPlayerAnyDimension(uuidEnd.get()));
+                            ClientCutsceneManager.queueCutscene(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0));
                             return;
                         }
                 }

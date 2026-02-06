@@ -31,7 +31,12 @@ public class BezierPath {
         ArrayList<BezierSpline> tempSplines = new ArrayList<>();
         for(BezierSpline spline : this.splines)
             tempSplines.add(spline);
-        tempSplines.addFirst(new BezierSpline(this.getPoints().getFirst(), this, player));
+        if(tempSplines.getFirst().isSinglePoint()) {
+            tempSplines.remove(0);
+            tempSplines.addFirst(new BezierSpline(this.getPoints().getFirst(), this, player, true));
+        }
+        else
+            tempSplines.addFirst(new BezierSpline(this.getPoints().getFirst(), this, player));
         newPath.splines = tempSplines;
         newPath.updateLUT();
         return newPath;
@@ -42,7 +47,12 @@ public class BezierPath {
         ArrayList<BezierSpline> tempSplines = new ArrayList<>();
         for(BezierSpline spline : this.splines)
             tempSplines.add(spline);
-        tempSplines.add(new BezierSpline(this.getPoints().getLast(), this, player));
+        if(tempSplines.getFirst().isSinglePoint()) {
+            tempSplines.remove(0);
+            tempSplines.add(new BezierSpline(this.getPoints().getLast(), this, player, false));
+        }
+        else
+            tempSplines.add(new BezierSpline(this.getPoints().getLast(), this, player));
         newPath.splines = tempSplines;
         newPath.updateLUT();
         return newPath;

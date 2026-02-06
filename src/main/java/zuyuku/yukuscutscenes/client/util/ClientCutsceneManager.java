@@ -10,7 +10,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.option.Perspective;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import zuyuku.yukuscutscenes.util.Cutscene;
@@ -68,18 +67,6 @@ public class ClientCutsceneManager implements ClientModInitializer{
 
     public static void queueCutscene(Cutscene cutscene, float length, LerpType lerpType, float holdStart, float holdEnd) {
         cutsceneQueue.add(new QueuedCutscene(cutscene, length, lerpType, holdStart, holdEnd));
-    }
-
-    public static void queueCutsceneEntityOrigin(Cutscene cutscene, float length, LerpType lerpType, float holdStart, float holdEnd, PlayerEntity player) {
-        cutsceneQueue.add(new QueuedCutscene(cutscene.originAtPlayer(player), length, lerpType, holdStart, holdEnd));
-    }
-
-    public static void queueCutsceneEntityEnd(Cutscene cutscene, float length, LerpType lerpType, float holdStart, float holdEnd, PlayerEntity player) {
-        cutsceneQueue.add(new QueuedCutscene(cutscene.endAtPlayer(player), length, lerpType, holdStart, holdEnd));
-    }
-
-    public static void queueCutsceneEntityOriginAndEnd(Cutscene cutscene, float length, LerpType lerpType, float holdStart, float holdEnd, PlayerEntity player, PlayerEntity endPlayer) {
-        cutsceneQueue.add(new QueuedCutscene(cutscene.endAtPlayer(endPlayer).originAtPlayer(player), length, lerpType, holdStart, holdEnd));
     }
 
     public static boolean cancelCutscene(Cutscene cutscene) {
