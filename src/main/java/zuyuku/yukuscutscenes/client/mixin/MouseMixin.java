@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.input.Scroller;
+import net.minecraft.client.option.KeyBinding;
 import zuyuku.yukuscutscenes.client.render.CurveRenderer;
 import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
 
@@ -21,11 +22,20 @@ public class MouseMixin {
     @Shadow
     protected Scroller scroller;
 
+    @Shadow
+	private MouseInput activeButton;
+
     
     @Inject(at = @At("HEAD"), method = "onMouseButton", cancellable = true)
     private void disableCutsceneInteract(long window, MouseInput input, @MouseInput.MouseAction int action, CallbackInfo info) {
-        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null)
+        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null) {
+            this.activeButton =  new MouseInput(-1, input.modifiers());
+            MC.options.attackKey.setPressed(false);
+            MC.options.useKey.setPressed(false);
+            MC.options.pickItemKey.setPressed(false);
+            KeyBinding.unpressAll();
             info.cancel();
+        }
     }
 
     @Inject(at = @At("HEAD"), method = "onMouseScroll", cancellable = true)

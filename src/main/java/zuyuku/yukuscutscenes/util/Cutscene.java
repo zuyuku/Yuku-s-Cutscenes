@@ -1,7 +1,10 @@
 package zuyuku.yukuscutscenes.util;
 
+import static zuyuku.yukuscutscenes.client.Client.MC;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,6 +26,8 @@ public class Cutscene {
     
     public final BezierPath path;
     private final String name;
+    private Optional<PlayerEntity> startPlayerOptional = Optional.empty();
+    private Optional<PlayerEntity> endPlayerOptional = Optional.empty();
     private Vec2f initialRot;
     private Vec2f finalRot;
 
@@ -35,12 +40,16 @@ public class Cutscene {
 
     public Cutscene originAtPlayer(PlayerEntity player) {
         BezierPath newPath = this.path.withPlayerOrigin(player);
-        return new Cutscene(name, player.getRotationClient(), finalRot, newPath);
+        Cutscene cutscene = new Cutscene(name, player.getRotationClient(), finalRot, newPath);
+        cutscene.startPlayerOptional = Optional.of(player);
+        return cutscene;
     }
 
     public Cutscene endAtPlayer(PlayerEntity player) {
         BezierPath newPath = this.path.withPlayerEnd(player);
-        return new Cutscene(name, initialRot, player.getRotationClient(), newPath);
+        Cutscene cutscene = new Cutscene(name, initialRot, player.getRotationClient(), newPath);
+        cutscene.endPlayerOptional = Optional.of(player);
+        return cutscene;
     }
 
     public void render(WorldRenderContext context) {
@@ -82,7 +91,6 @@ public class Cutscene {
         y += relativeCoordinate.y * Math.cos(pitchRadians);
         z += relativeCoordinate.y * Math.sin(pitchRadians) * Math.sin(yawRadians);
 
-        // Vec3d point2 = new Vec3d(-1 * relativeCoordinate.z * Math.sin(yawRadians) + x, y, relativeCoordinate.z * Math.cos(yawRadians) + z);
         Vec3d point2 = new Vec3d(x, y, z);
         return point2;
     }
@@ -100,6 +108,10 @@ public class Cutscene {
     }
 
     public Vec3d getPosAt(float t) {
+        if(this.startPlayerOptional.isPresent()) 
+            this.path.getPoints().getFirst().setPos(this.startPlayerOptional.get().getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(true)));
+        if(this.endPlayerOptional.isPresent())
+            this.path.getPoints().getLast().setPos(this.endPlayerOptional.get().getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(true)));
         return path.lerpSpeedWeighted(t);
     }
 
