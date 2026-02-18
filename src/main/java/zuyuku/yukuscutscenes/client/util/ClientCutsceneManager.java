@@ -16,7 +16,7 @@ import zuyuku.yukuscutscenes.util.Cutscene;
 import zuyuku.yukuscutscenes.util.LerpType;
 
 @Environment(EnvType.CLIENT)
-public class ClientCutsceneManager implements ClientModInitializer{
+public class ClientCutsceneManager implements ClientModInitializer {
     public static final double RENDER_PLAYER_RANGE = 1.0;
 
     private static ArrayList<QueuedCutscene> cutsceneQueue = new ArrayList<>();

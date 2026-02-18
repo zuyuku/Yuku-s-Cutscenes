@@ -49,7 +49,7 @@ public class Cutscene {
         int color = ColorHelper.fromFloats(1.0f, 0.5f, 0.5f, 0.5f);
         renderPointsRelative(root, relativePoints, initialRot, color);
         renderPointsRelative(tail, relativePoints, finalRot, color);
-        if(CurveRenderer.storedPoint != null && CurveRenderer.storedPoint.isEnd()) {
+        if(CurveRenderer.storedPoint != null && CurveRenderer.storedPoint.isEnd() && CurveRenderer.storedDistance == 0) {
             GizmoDrawing.text(this.name, rotatePointRelative(root, relativePoints.get(1).add(new Vec3d(0, -.03, .03)), this.initialRot), TextGizmo.Style.centered(ColorHelper.fromFloats(1.0f, 1.0f, 1.0f, 1.0f)).scaled(0.075f));
             return;
         }
@@ -89,10 +89,14 @@ public class Cutscene {
 
     public void setInitRot(Vec2f rot) {
         this.initialRot = rot;
+        if(path.isSinglePoint())
+            this.finalRot = rot;
     }
 
     public void setFinalRot(Vec2f rot) {
         this.finalRot = rot;
+        if(path.isSinglePoint())
+            this.initialRot = rot;
     }
 
     public Vec3d getPosAt(float t) {

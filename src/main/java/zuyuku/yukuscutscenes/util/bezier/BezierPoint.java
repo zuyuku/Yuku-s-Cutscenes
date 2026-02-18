@@ -92,10 +92,10 @@ public class BezierPoint {
         if(MC.player.getEyePos().distanceTo(this.pos) < 0.1)
             return;
         int color = this.getColor();
-        if(this.path.isSinglePoint())
-            color = ColorHelper.fromFloats(1.0f, 0.0f, 1.0f, 0.0f);
-        else if(this.isHovered(MC.player))
+        if(this.isHovered(MC.player))
             color = ColorHelper.fromFloats(1.0f, 1.0f, 1.0f, 1.0f);
+        else if(this.path.isSinglePoint())
+            color = ColorHelper.fromFloats(1.0f, 0.0f, 1.0f, 0.0f);
         if(this.isTangent())
             GizmoDrawing.line(this.pos, this.getRoot().pos, ColorHelper.scaleAlpha(this.getColor(), 0.5f), 5);
         GizmoDrawing.box(new Box(this.pos.add(new Vec3d(size,size,size)), this.pos.subtract(new Vec3d(size,size,size))), DrawStyle.stroked(color), true);

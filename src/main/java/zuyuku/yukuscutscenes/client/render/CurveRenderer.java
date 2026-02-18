@@ -15,6 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import zuyuku.yukuscutscenes.YukusCutscenes;
@@ -36,16 +37,32 @@ public class CurveRenderer implements ClientModInitializer {
                 cutscene.render(context);
             if(storedPoint != null) {
                 storedPoint.setPos(calculateNewPoint(MC.player));
+                for(Cutscene cutscene : cutscenes)
+                    for(BezierPoint nearPoint : cutscene.path.getPoints())
+                        if(nearPoint != storedPoint)
+                            if(nearPoint.getPos().distanceTo(storedPoint.getPos()) <= 0.1) {
+                                storedPoint.setPos(nearPoint.getPos());
+                                if(storedPoint.isEnd() && nearPoint.isEnd()) {
+                                    Vec2f rot = nearPoint.getPath().getClientCutscene().getRotAt(1);
+                                    if(nearPoint.isFirst())
+                                        rot = nearPoint.getPath().getClientCutscene().getRotAt(0);
+                                    if(storedPoint.isFirst())
+                                        storedPoint.getPath().getClientCutscene().setInitRot(rot);
+                                    else if(storedPoint.isLast())
+                                        storedPoint.getPath().getClientCutscene().setFinalRot(rot);
+                                }
+                                return;
+                            }
                 if(storedPoint.isFirst())
                     storedPoint.getPath().getClientCutscene().setInitRot(MC.player.getRotationClient());
-                if(storedPoint.isLast())
+                else if(storedPoint.isLast())
                     storedPoint.getPath().getClientCutscene().setFinalRot(MC.player.getRotationClient());
             }
         }
 	}
 
     public static void updateStoredDistance(double i) {
-        storedDistance += (i*0.25);
+        storedDistance = Math.max(storedDistance + (i*0.25), 0);
     }
 
     private Vec3d calculateNewPoint(LivingEntity user) {
