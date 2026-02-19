@@ -106,16 +106,14 @@ public class BezierSpline {
     public BezierSpline(BezierPoint point, BezierPath owner, PlayerEntity player, boolean startAtPlayer) {
         this.path = owner;
         if(startAtPlayer) {
-            this.v2 = point;
-            BezierPoint split = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
-            this.v2_tangent = split;
-            this.v1_tangent = split;
+            this.v2 = new BezierPoint(this, point.getPos(), false);
+            this.v2_tangent = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
+            this.v1_tangent = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
             this.v1 = new BezierPoint(this, player.getEyePos(), false);
         } else {
-            this.v1 = point;
-            BezierPoint split = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
-            this.v2_tangent = split;
-            this.v1_tangent = split;
+            this.v1 = new BezierPoint(this, point.getPos(), false);;
+            this.v2_tangent = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
+            this.v1_tangent = new BezierPoint(this, point.getPos().subtract(player.getEyePos()).multiply(0.5).add(player.getEyePos()), true);
             this.v2 = new BezierPoint(this, player.getEyePos(), false);
         }
         points = List.of(v1,v1_tangent,v2_tangent,v2);
@@ -126,15 +124,15 @@ public class BezierSpline {
         this.path = owner;
         if(point.isFirst()) {
             this.v2 = point;
-            Vec3d offset = v2.getTangents().get(0).getPos().subtract(v2.getPos());
-            this.v2_tangent = new BezierPoint(this, v2.getPos().subtract(offset), true);
-            this.v1_tangent= this.v2_tangent;
+            Vec3d offset = v2.getPos().subtract(v2.getTangents().get(0).getPos().subtract(v2.getPos()));
+            this.v2_tangent = new BezierPoint(this, offset, true);
+            this.v1_tangent= new BezierPoint(this, offset, true);
             this.v1 = new BezierPoint(this, player.getEyePos(), false);
         } else {
             this.v1 = point;
-            Vec3d offset = v1.getTangents().get(0).getPos().subtract(v1.getPos());
-            this.v1_tangent = new BezierPoint(this, v1.getPos().subtract(offset), true);
-            this.v2_tangent= this.v1_tangent;
+            Vec3d offset = v1.getPos().subtract(v1.getTangents().get(0).getPos().subtract(v1.getPos()));
+            this.v1_tangent = new BezierPoint(this, offset, true);
+            this.v2_tangent= new BezierPoint(this, offset, true);
             this.v2 = new BezierPoint(this, player.getEyePos(), false);
         }
         points = List.of(v1,v1_tangent,v2_tangent,v2);

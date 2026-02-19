@@ -2,6 +2,7 @@ package zuyuku.yukuscutscenes.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -101,84 +102,84 @@ public class CutsceneCommand implements ModInitializer {
                         .then(
                             CommandManager.literal("play")
                             .then(
-                                CommandManager.argument("name", IdentifierArgumentType.identifier())
-                                .suggests(SUGGESTION_PROVIDER)
+                                CommandManager.argument("player", EntityArgumentType.player())
                                 .then(
-                                    CommandManager.argument("length", TimeArgumentType.time(0))
+                                    CommandManager.argument("name", IdentifierArgumentType.identifier())
+                                    .suggests(SUGGESTION_PROVIDER)
                                     .then(
-                                        CommandManager.literal(lerpType.name())
-                                        .executes(context -> {
-                                            boolean cont = false;
-                                            String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
-                                            CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
-                                            for(Cutscene cutscene2 : manager.getCutscenes())
-                                                if(name.matches(cutscene2.getName()))
-                                                    cont = true;
-                                            if(!cont) {
-                                                context.getSource().sendError(Text.of("No cutscene found with that name."));
-                                                return 0;
-                                            }
-                                            NbtCompound nbt = new NbtCompound();
-                                            nbt.putString("PlayName", name);
-                                            nbt.putString("LerpType", lerpType.name());
-                                            nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                            manager.syncToPlayer(context.getSource().getPlayer());
-                                            ServerPlayNetworking.send(context.getSource().getPlayer(), new CutscenePayload(nbt));
-                                            return 1;
-                                        })
+                                        CommandManager.argument("length", TimeArgumentType.time(0))
                                         .then(
-                                            CommandManager.literal(holdType.get(0))
+                                            CommandManager.literal(lerpType.name())
+                                            .executes(context -> {
+                                                boolean cont = false;
+                                                String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
+                                                CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
+                                                for(Cutscene cutscene2 : manager.getCutscenes())
+                                                    if(name.matches(cutscene2.getName()))
+                                                        cont = true;
+                                                if(!cont) {
+                                                    context.getSource().sendError(Text.of("No cutscene found with that name."));
+                                                    return 0;
+                                                }
+                                                NbtCompound nbt = new NbtCompound();
+                                                nbt.putString("PlayName", name);
+                                                nbt.putString("LerpType", lerpType.name());
+                                                nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
+                                                manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
+                                                ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                return 1;
+                                            })
                                             .then(
-                                                CommandManager.argument(holdType.get(0), TimeArgumentType.time(0))
-                                                .executes(context -> {
-                                                    boolean cont = false;
-                                                    String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
-                                                    CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
-                                                    for(Cutscene cutscene2 : manager.getCutscenes())
-                                                        if(name.matches(cutscene2.getName()))
-                                                            cont = true;
-                                                    if(!cont) {
-                                                        context.getSource().sendError(Text.of("No cutscene found with that name."));
-                                                        return 0;
-                                                    }
-                                                    NbtCompound nbt = new NbtCompound();
-                                                    nbt.putString("PlayName", name);
-                                                    nbt.putString("LerpType", lerpType.name());
-                                                    nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                    nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                    manager.syncToPlayer(context.getSource().getPlayer());
-                                                    ServerPlayNetworking.send(context.getSource().getPlayer(), new CutscenePayload(nbt));
-                                                    return 1;
-                                                })
+                                                CommandManager.literal(holdType.get(0))
                                                 .then(
-                                                    CommandManager.literal(holdType.get(1))
+                                                    CommandManager.argument(holdType.get(0), TimeArgumentType.time(0))
+                                                    .executes(context -> {
+                                                        boolean cont = false;
+                                                        String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
+                                                        CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
+                                                        for(Cutscene cutscene2 : manager.getCutscenes())
+                                                            if(name.matches(cutscene2.getName()))
+                                                                cont = true;
+                                                        if(!cont) {
+                                                            context.getSource().sendError(Text.of("No cutscene found with that name."));
+                                                            return 0;
+                                                        }
+                                                        NbtCompound nbt = new NbtCompound();
+                                                        nbt.putString("PlayName", name);
+                                                        nbt.putString("LerpType", lerpType.name());
+                                                        nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
+                                                        nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
+                                                        manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
+                                                        ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                        return 1;
+                                                    })
                                                     .then(
-                                                        CommandManager.argument(holdType.get(1), TimeArgumentType.time(0))
-                                                        .executes(context -> {
-                                                            boolean cont = false;
-                                                            String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
-                                                            CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
-                                                            for(Cutscene cutscene2 : manager.getCutscenes())
-                                                                if(name.matches(cutscene2.getName()))
-                                                                    cont = true;
-                                                            if(!cont) {
-                                                                context.getSource().sendError(Text.of("No cutscene found with that name."));
-                                                                return 0;
-                                                            }
-                                                            NbtCompound nbt = new NbtCompound();
-                                                            nbt.putString("PlayName", name);
-                                                            nbt.putString("LerpType", lerpType.name());
-                                                            nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                            nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                            nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
-                                                            manager.syncToPlayer(context.getSource().getPlayer());
-                                                            ServerPlayNetworking.send(context.getSource().getPlayer(), new CutscenePayload(nbt));
-                                                            return 1;
-                                                        })
+                                                        CommandManager.literal(holdType.get(1))
                                                         .then(
-                                                            CommandManager.literal(anchorType.get(0))
+                                                            CommandManager.argument(holdType.get(1), TimeArgumentType.time(0))
+                                                            .executes(context -> {
+                                                                boolean cont = false;
+                                                                String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
+                                                                CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
+                                                                for(Cutscene cutscene2 : manager.getCutscenes())
+                                                                    if(name.matches(cutscene2.getName()))
+                                                                        cont = true;
+                                                                if(!cont) {
+                                                                    context.getSource().sendError(Text.of("No cutscene found with that name."));
+                                                                    return 0;
+                                                                }
+                                                                NbtCompound nbt = new NbtCompound();
+                                                                nbt.putString("PlayName", name);
+                                                                nbt.putString("LerpType", lerpType.name());
+                                                                nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
+                                                                nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
+                                                                nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
+                                                                manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
+                                                                ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                                return 1;
+                                                            })
                                                             .then(
-                                                                CommandManager.argument(anchorType.get(0), EntityArgumentType.player())
+                                                                CommandManager.literal(anchorType.get(0))
                                                                 .executes(context -> {
                                                                     boolean cont = false;
                                                                     String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
@@ -191,44 +192,43 @@ public class CutsceneCommand implements ModInitializer {
                                                                         return 0;
                                                                     }
                                                                     NbtCompound nbt = new NbtCompound();
+                                                                    UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
                                                                     nbt.putString("PlayName", name);
                                                                     nbt.putString("LerpType", lerpType.name());
                                                                     nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
                                                                     nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
                                                                     nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
-                                                                    nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, EntityArgumentType.getPlayer(context, anchorType.get(0)).getUuid());
-                                                                    manager.syncToPlayer(context.getSource().getPlayer());
-                                                                    ServerPlayNetworking.send(context.getSource().getPlayer(), new CutscenePayload(nbt));
+                                                                    nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, playerUuid);
+                                                                    manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
+                                                                    ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
                                                                     return 1;
                                                                 })
                                                                 .then(
                                                                     CommandManager.literal(anchorType.get(1))
-                                                                    .then(
-                                                                        CommandManager.argument(anchorType.get(1), EntityArgumentType.player())
-                                                                        .executes(context -> {
-                                                                            boolean cont = false;
-                                                                            String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
-                                                                            CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
-                                                                            for(Cutscene cutscene2 : manager.getCutscenes())
-                                                                                if(name.matches(cutscene2.getName()))
-                                                                                    cont = true;
-                                                                            if(!cont) {
-                                                                                context.getSource().sendError(Text.of("No cutscene found with that name."));
-                                                                                return 0;
-                                                                            }
-                                                                            NbtCompound nbt = new NbtCompound();
-                                                                            nbt.putString("PlayName", name);
-                                                                            nbt.putString("LerpType", lerpType.name());
-                                                                            nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                                            nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                                            nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
-                                                                            nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, EntityArgumentType.getPlayer(context, anchorType.get(0)).getUuid());
-                                                                            nbt.put(anchorType.get(1), Uuids.INT_STREAM_CODEC, EntityArgumentType.getPlayer(context, anchorType.get(1)).getUuid());
-                                                                            manager.syncToPlayer(context.getSource().getPlayer());
-                                                                            ServerPlayNetworking.send(context.getSource().getPlayer(), new CutscenePayload(nbt));
-                                                                            return 1;
-                                                                        })
-                                                                    )
+                                                                    .executes(context -> {
+                                                                        boolean cont = false;
+                                                                        String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
+                                                                        CutsceneManager manager = CutsceneManager.getFromWorld(context.getSource().getWorld());
+                                                                        for(Cutscene cutscene2 : manager.getCutscenes())
+                                                                            if(name.matches(cutscene2.getName()))
+                                                                                cont = true;
+                                                                        if(!cont) {
+                                                                            context.getSource().sendError(Text.of("No cutscene found with that name."));
+                                                                            return 0;
+                                                                        }
+                                                                        NbtCompound nbt = new NbtCompound();
+                                                                        UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
+                                                                        nbt.putString("PlayName", name);
+                                                                        nbt.putString("LerpType", lerpType.name());
+                                                                        nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
+                                                                        nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
+                                                                        nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
+                                                                        nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, playerUuid);
+                                                                        nbt.put(anchorType.get(1), Uuids.INT_STREAM_CODEC, playerUuid);
+                                                                        manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
+                                                                        ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                                        return 1;
+                                                                    })
                                                                 )
                                                             )
                                                         )

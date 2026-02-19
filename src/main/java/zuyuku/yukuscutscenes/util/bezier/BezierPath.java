@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Vec3d;
+import zuyuku.yukuscutscenes.YukusCutscenes;
 import zuyuku.yukuscutscenes.client.render.CurveRenderer;
 import zuyuku.yukuscutscenes.util.Cutscene;
 
@@ -51,8 +52,21 @@ public class BezierPath {
             tempSplines.remove(0);
             tempSplines.add(new BezierSpline(this.getPoints().getLast(), newPath, player, false));
         }
-        else
+        else {
+            ArrayList<BezierPoint> send = new ArrayList<>();
+            for(BezierSpline spline : this.splines) {
+                for(BezierPoint point : spline.points){
+                    if(point.isTangent())
+                        YukusCutscenes.LOGGER.info(point.getPos().toString() + " tangent");
+                    else
+                        YukusCutscenes.LOGGER.info(point.getPos().toString() + " node");
+                    if(!send.contains(point)){
+                        send.add(point);
+                    } else
+                        YukusCutscenes.LOGGER.info("duplicate");}
+            }
             tempSplines.add(new BezierSpline(this.getPoints().getLast(), newPath, player));
+        }
         newPath.splines = tempSplines;
         newPath.updateLUT();
         return newPath;
