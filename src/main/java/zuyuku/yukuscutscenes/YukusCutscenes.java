@@ -16,9 +16,12 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import zuyuku.yukuscutscenes.command.CutsceneCommand;
+import zuyuku.yukuscutscenes.command.ScreenEffectCommand;
 import zuyuku.yukuscutscenes.item.EditorItem;
 import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
+import zuyuku.yukuscutscenes.util.ScreenEffectPayload;
 
 public class YukusCutscenes implements ModInitializer {
 	public static final String MOD_ID = "yukuscutscenes";
@@ -34,11 +37,18 @@ public class YukusCutscenes implements ModInitializer {
 	public void onInitialize() {
 		Registry.register(Registries.ITEM, key, editorItem);
 		initializePayloads();
+		initializeCommands();
+	}
+
+	private void initializeCommands() {
+		CutsceneCommand.initialize();
+		ScreenEffectCommand.initialize();
 	}
 
 	private void initializePayloads() {
         PayloadTypeRegistry.playC2S().register(CutscenePayload.ID, CutscenePayload.CODEC);
         PayloadTypeRegistry.playS2C().register(CutscenePayload.ID, CutscenePayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(ScreenEffectPayload.ID, ScreenEffectPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(CutscenePayload.ID, (payload, context) -> recieveClient(payload, context));
 	}

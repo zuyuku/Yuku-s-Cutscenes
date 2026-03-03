@@ -16,13 +16,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"zuyuku.yukuscutscenes.YukusCutscenes",
-			"zuyuku.yukuscutscenes.command.CutsceneCommand"
+			"zuyuku.yukuscutscenes.YukusCutscenes"
 		],
 		"client": [
 			"zuyuku.yukuscutscenes.client.Client",
 			"zuyuku.yukuscutscenes.client.render.CurveRenderer",
-			"zuyuku.yukuscutscenes.client.util.ClientCutsceneManager"
+			"zuyuku.yukuscutscenes.client.util.ClientCutsceneManager",
+			"zuyuku.yukuscutscenes.client.util.ClientScreenEffectManager"
 		]
 	},
 	"mixins": [

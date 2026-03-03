@@ -3,8 +3,6 @@ package zuyuku.yukuscutscenes.client.render;
 import static zuyuku.yukuscutscenes.client.Client.MC;
 
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -14,16 +12,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.Uuids;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import zuyuku.yukuscutscenes.YukusCutscenes;
-import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
 import zuyuku.yukuscutscenes.util.Cutscene;
-import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
-import zuyuku.yukuscutscenes.util.LerpType;
 import zuyuku.yukuscutscenes.util.bezier.BezierPoint;
 
 public class CurveRenderer implements ClientModInitializer {
@@ -92,27 +85,6 @@ public class CurveRenderer implements ClientModInitializer {
             NbtCompound nbt = new NbtCompound();
             nbt.putBoolean("Request", true);
             ClientPlayNetworking.send(new CutscenePayload(nbt));
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(CutscenePayload.ID, (payload, context) -> {
-            context.client().execute(() -> {
-                String name = payload.nbt().getString("PlayName", "NULLNULL");
-                if(!name.matches("NULLNULL")) {
-                    for(Cutscene cutscene : cutscenes)
-                        if(cutscene.getName().matches(name)) {
-                            Optional<UUID> uuidStart = payload.nbt().get("startPlayer", Uuids.INT_STREAM_CODEC);
-                            Optional<UUID> uuidEnd = payload.nbt().get("endPlayer", Uuids.INT_STREAM_CODEC);
-                            World world = MC.world;
-                            if(uuidStart.isPresent())
-                                cutscene = cutscene.originAtPlayer(world.getPlayerAnyDimension(uuidStart.get()));
-                            if(uuidEnd.isPresent())
-                                cutscene = cutscene.endAtPlayer(world.getPlayerAnyDimension(uuidEnd.get()));
-                            ClientCutsceneManager.queueCutscene(cutscene, payload.nbt().getInt("Length", 0), LerpType.fromString(payload.nbt().getString("LerpType", "LINEAR")), payload.nbt().getInt("holdStart", 0), payload.nbt().getInt("holdEnd", 0));
-                            return;
-                        }
-                }
-                cutscenes = CutsceneManager.makeList(payload.nbt());
-            });
         });
     }
 }

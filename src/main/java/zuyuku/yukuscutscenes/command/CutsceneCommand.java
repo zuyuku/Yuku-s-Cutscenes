@@ -9,7 +9,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandSource;
@@ -28,13 +27,12 @@ import zuyuku.yukuscutscenes.util.CutscenePayload;
 import zuyuku.yukuscutscenes.util.LerpType;
 import zuyuku.yukuscutscenes.util.bezier.BezierPath;
 
-public class CutsceneCommand implements ModInitializer {
+public class CutsceneCommand {
     public static final SuggestionProvider<ServerCommandSource> SUGGESTION_PROVIDER = (context, builder) -> CommandSource.suggestIdentifiers(
 		CutsceneManager.getFromWorld(context.getSource().getWorld()).getSuggestions(), builder
 	);
 
-    @Override
-    public void onInitialize() {
+    public static void initialize() {
         List<List<String>> holdTypes = List.of(List.of("holdStart", "holdEnd"), List.of("holdEnd", "holdStart"));
         List<List<String>> anchorTypes = List.of(List.of("startPlayer", "endPlayer"), List.of("endPlayer", "startPlayer"));
         for(List<String> anchorType : anchorTypes) {
@@ -246,7 +244,7 @@ public class CutsceneCommand implements ModInitializer {
         }
     }
 
-    private int addCutscene(ServerCommandSource source, String name) {
+    private static int addCutscene(ServerCommandSource source, String name) {
         CutsceneManager manager = CutsceneManager.getFromWorld(source.getWorld());
         ArrayList<Cutscene> cutscenes = manager.getCutscenes();
         for(Cutscene cutscene : cutscenes)
