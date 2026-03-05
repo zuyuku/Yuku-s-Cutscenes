@@ -7,7 +7,8 @@
 		"CameraMixin",
 		"KeyboardMixin",
 		"GameRendererAccessor",
-		"PostEffectPassMixin"
+		"PostEffectPassMixin",
+		"InputMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

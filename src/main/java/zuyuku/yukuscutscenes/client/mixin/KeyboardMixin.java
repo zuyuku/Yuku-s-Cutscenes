@@ -12,13 +12,14 @@ import net.minecraft.client.Keyboard;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
+import zuyuku.yukuscutscenes.client.util.ClientScreenEffectManager;
 
 @Mixin(Keyboard.class)
 public class KeyboardMixin {
 
     @Inject(method = "onKey", at=@At("head"), cancellable = true)
     public void disableCutsceneMovement(long window, @KeyInput.KeyAction int action, KeyInput input, CallbackInfo info) {
-        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null && input.key() != GLFW.GLFW_KEY_ESCAPE && !MC.options.fullscreenKey.matchesKey(input)) {
+        if((ClientScreenEffectManager.disableMovement() || ClientCutsceneManager.inCutscene()) && MC.currentScreen == null && input.key() != GLFW.GLFW_KEY_ESCAPE && !MC.options.fullscreenKey.matchesKey(input)) {
             KeyBinding.unpressAll();
             info.cancel();
         }

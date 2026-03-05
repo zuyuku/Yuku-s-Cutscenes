@@ -15,6 +15,7 @@ import net.minecraft.client.input.Scroller;
 import net.minecraft.client.option.KeyBinding;
 import zuyuku.yukuscutscenes.client.render.CurveRenderer;
 import zuyuku.yukuscutscenes.client.util.ClientCutsceneManager;
+import zuyuku.yukuscutscenes.client.util.ClientScreenEffectManager;
 
 @Mixin(Mouse.class)
 public class MouseMixin {
@@ -28,7 +29,7 @@ public class MouseMixin {
     
     @Inject(at = @At("HEAD"), method = "onMouseButton", cancellable = true)
     private void disableCutsceneInteract(long window, MouseInput input, @MouseInput.MouseAction int action, CallbackInfo info) {
-        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null) {
+        if((ClientScreenEffectManager.disableMovement() || ClientCutsceneManager.inCutscene()) && MC.currentScreen == null) {
             this.activeButton =  new MouseInput(-1, input.modifiers());
             MC.options.attackKey.setPressed(false);
             MC.options.useKey.setPressed(false);
@@ -42,7 +43,7 @@ public class MouseMixin {
     private void editorScrolling(long window, double horizontal, double vertical, CallbackInfo info) {
         if(this.scroller == null)
             return;
-        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null)
+        if((ClientScreenEffectManager.disableMovement() || ClientCutsceneManager.inCutscene()) && MC.currentScreen == null)
             info.cancel();
         if(CurveRenderer.storedPoint != null) {
 			boolean bl = MC.options.getDiscreteMouseScroll().getValue();
@@ -60,7 +61,7 @@ public class MouseMixin {
 
     @Inject(method = "updateMouse", at=@At("HEAD"), cancellable = true)
     public void disableCutsceneLook(CallbackInfo info) {
-        if(ClientCutsceneManager.inCutscene() && MC.currentScreen == null) 
+        if((ClientScreenEffectManager.disableMovement() || ClientCutsceneManager.inCutscene()) && MC.currentScreen == null) 
             info.cancel();
     }
 }

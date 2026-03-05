@@ -110,8 +110,10 @@ public class Cutscene {
     public Vec3d getPosAt(float t) {
         if(this.startPlayerOptional.isPresent()) 
             this.path.getPoints().getFirst().setPos(this.startPlayerOptional.get().getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(true)));
-        if(this.endPlayerOptional.isPresent())
+        if(this.endPlayerOptional.isPresent()) {
             this.path.getPoints().getLast().setPos(this.endPlayerOptional.get().getClientCameraPosVec(MC.getRenderTickCounter().getTickProgress(true)));
+            this.finalRot = this.endPlayerOptional.get().getRotationClient();
+        }
         return path.lerpSpeedWeighted(t);
     }
 

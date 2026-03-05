@@ -7,12 +7,12 @@ public enum LerpType implements LerpOperation<Float>{
     SINE_OUT(x ->(float)(Math.sin((x * Math.PI) / 2))),
     SINE_IN_OUT(x -> (float)(-(Math.cos(Math.PI * x) - 1) / 2)),
     
-    CUBIT_IN(x -> x * x * x),
-    CUBIT_OUT(x -> (float)(1 - Math.pow(1 - x, 3))),
-    CUBIT_IN_OUT(x -> (float)(x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)),
+    CUBIC_IN(x -> x * x * x),
+    CUBIC_OUT(x -> (float)(1 - Math.pow(1 - x, 3))),
+    CUBIC_IN_OUT(x -> (float)(x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)),
     
     QUINT_IN(x -> x * x * x * x * x),
-    QUINT_OUTT(x -> (float)(1 - Math.pow(1 - x, 5))),
+    QUINT_OUT(x -> (float)(1 - Math.pow(1 - x, 5))),
     QUINT_IN_OUT(x -> (float)(x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2)),
 
     BOUNCE_OUT(x -> {float n1 = 7.5625f;

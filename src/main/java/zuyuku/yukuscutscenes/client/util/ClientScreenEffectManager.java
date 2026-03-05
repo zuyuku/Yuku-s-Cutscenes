@@ -10,19 +10,26 @@ import zuyuku.yukuscutscenes.util.ScreenEffectPayload;
 
 public class ClientScreenEffectManager implements ClientModInitializer {
 
-    
     public static ScreenEffectInstance screenEffect;
 
     @Override
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(ScreenEffectPayload.ID, (payload, context) -> {
-            screenEffect = new ScreenEffectInstance(payload.name(), payload.introTicks(), payload.holdTicks(), payload.outroTicks(), payload.lerpType());
+            screenEffect = new ScreenEffectInstance(payload.name(), payload.introTicks(), payload.holdTicks(), payload.outroTicks(), payload.lerpType(), payload.command());
             MC.options.hudHidden = true;
         });
 
         WorldRenderEvents.END_MAIN.register(client -> {
-            if(screenEffect != null)
+            if(inScreenEffect())
                 screenEffect.update(MC.getRenderTickCounter().getDynamicDeltaTicks());
         });
+    }
+
+    public static boolean inScreenEffect() {
+        return screenEffect != null;
+    }
+
+    public static boolean disableMovement() {
+        return !inScreenEffect() ? false : !screenEffect.canPlayerMove();
     }
 }

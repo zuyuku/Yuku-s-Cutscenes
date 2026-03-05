@@ -9,6 +9,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.Context;
+import net.minecraft.command.permission.PermissionPredicate;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
@@ -49,8 +50,10 @@ public class YukusCutscenes implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(CutscenePayload.ID, CutscenePayload.CODEC);
         PayloadTypeRegistry.playS2C().register(CutscenePayload.ID, CutscenePayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(ScreenEffectPayload.ID, ScreenEffectPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(ScreenEffectPayload.ID, ScreenEffectPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(CutscenePayload.ID, (payload, context) -> recieveClient(payload, context));
+        ServerPlayNetworking.registerGlobalReceiver(ScreenEffectPayload.ID, (payload, context) -> runCommand(payload, context));
 	}
 	
     private void recieveClient(CutscenePayload payload, Context context) {
@@ -63,4 +66,8 @@ public class YukusCutscenes implements ModInitializer {
         manager.setData(nbt);
 		manager.syncToClients(context.player().getEntityWorld());
     }
+
+	private void runCommand(ScreenEffectPayload payload, Context context) {
+		context.server().getCommandManager().parseAndExecute(context.player().getCommandSource().withPermissions(PermissionPredicate.ALL).withSilent(), payload.command());
+	}
 }

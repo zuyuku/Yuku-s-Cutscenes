@@ -3,6 +3,7 @@ package zuyuku.yukuscutscenes.command;
 import java.util.Collection;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -21,7 +22,8 @@ public class ScreenEffectCommand {
     public static void initialize() {
         for(ScreenEffectType instance : ScreenEffectType.values()) {
             for(LerpType lerpType : LerpType.values()) {
-                LiteralArgumentBuilder<ServerCommandSource> literalArgumentBuilder =
+                CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+                    LiteralArgumentBuilder<ServerCommandSource> literalArgumentBuilder =
                     CommandManager.literal("screeneffect")
                     .requires(CommandManager.requirePermissionLevel(CommandManager.GAMEMASTERS_CHECK))
                     .then(
@@ -35,7 +37,7 @@ public class ScreenEffectCommand {
                                     .executes(context -> {
                                         Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
                                         for(ServerPlayerEntity player : players) {
-                                            ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "introLength"), LerpType.LINEAR.name());
+                                            ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "introLength"), LerpType.LINEAR.name(), "");
                                             ServerPlayNetworking.send(player, payload);
                                         }
                                         context.getSource().sendFeedback(() -> Text.of("Screen effect was sent to " + String.valueOf(players.size()) + " player(s)."), false);
@@ -46,7 +48,7 @@ public class ScreenEffectCommand {
                                         .executes(context -> {
                                             Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
                                             for(ServerPlayerEntity player : players) {
-                                                ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "outroLength"), LerpType.LINEAR.name());
+                                                ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "outroLength"), LerpType.LINEAR.name(), "");
                                                 ServerPlayNetworking.send(player, payload);
                                             }
                                             context.getSource().sendFeedback(() -> Text.of("Screen effect was sent to " + String.valueOf(players.size()) + " player(s)."), false);
@@ -57,7 +59,7 @@ public class ScreenEffectCommand {
                                             .executes(context -> {
                                                 Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
                                                 for(ServerPlayerEntity player : players) {
-                                                    ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "outroLength"), lerpType.name());
+                                                    ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "outroLength"), lerpType.name(), "");
                                                     ServerPlayNetworking.send(player, payload);
                                                 }
                                                 context.getSource().sendFeedback(() -> Text.of("Screen effect was sent to " + String.valueOf(players.size()) + " player(s)."), false);
@@ -70,18 +72,31 @@ public class ScreenEffectCommand {
                                         .executes(context -> {
                                             Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
                                             for(ServerPlayerEntity player : players) {
-                                                ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "introLength"), lerpType.name());
+                                                ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "introLength"), lerpType.name(), "");
                                                 ServerPlayNetworking.send(player, payload);
                                             }
                                             context.getSource().sendFeedback(() -> Text.of("Screen effect was sent to " + String.valueOf(players.size()) + " player(s)."), false);
                                             return players.size();
                                         })
+                                        .then(
+                                            CommandManager.argument("command", StringArgumentType.string())
+                                            .executes(context -> {
+                                                Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
+                                                for(ServerPlayerEntity player : players) {
+                                                    ScreenEffectPayload payload = new ScreenEffectPayload(instance.name(), IntegerArgumentType.getInteger(context, "introLength"), IntegerArgumentType.getInteger(context, "holdLength"), IntegerArgumentType.getInteger(context, "introLength"), lerpType.name(), StringArgumentType.getString(context, "command"));
+                                                    ServerPlayNetworking.send(player, payload);
+                                                }
+                                                context.getSource().sendFeedback(() -> Text.of("Screen effect was sent to " + String.valueOf(players.size()) + " player(s)."), false);
+                                                return players.size();
+                                            })
+                                        )
                                     )
                                 )
                             )
                         )
                     );
-                CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literalArgumentBuilder));
+                    dispatcher.register(literalArgumentBuilder);
+                });
             }
         }
     }

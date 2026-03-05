@@ -73,7 +73,8 @@ public class ClientCutsceneManager implements ClientModInitializer {
         if(currentAgeInTicks >= currentLengthInTicks + holdTimeEnd + holdTimeStart) {
             if(cutsceneQueue.isEmpty()) {
                 currentCutscene = null;
-                MC.options.hudHidden = false;
+                if(!ClientScreenEffectManager.inScreenEffect())
+                    MC.options.hudHidden = false;
                 return;
             }
             setCutscene(cutsceneQueue.getFirst());
