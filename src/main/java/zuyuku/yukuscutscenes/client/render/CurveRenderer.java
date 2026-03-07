@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import zuyuku.yukuscutscenes.YukusCutscenes;
@@ -29,6 +30,7 @@ public class CurveRenderer implements ClientModInitializer {
             for(Cutscene cutscene : cutscenes)
                 cutscene.render(context);
             if(storedPoint != null) {
+                MC.player.sendMessage(Text.of("Scroll to push/pull points."), true);
                 storedPoint.setPos(calculateNewPoint(MC.player));
                 for(Cutscene cutscene : cutscenes)
                     for(BezierPoint nearPoint : cutscene.path.getPoints())

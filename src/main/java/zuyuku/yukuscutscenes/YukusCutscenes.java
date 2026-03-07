@@ -1,5 +1,6 @@
 package zuyuku.yukuscutscenes;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -10,12 +11,17 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.Context;
 import net.minecraft.command.permission.PermissionPredicate;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import zuyuku.yukuscutscenes.command.CutsceneCommand;
 import zuyuku.yukuscutscenes.command.ScreenEffectCommand;
@@ -29,7 +35,8 @@ public class YukusCutscenes implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static Function<Item.Settings, Item> factory = EditorItem::new;
-	public static Item.Settings settings = new Item.Settings();
+	private static Style style = Style.EMPTY.withItalic(false).withColor(Formatting.GRAY);
+	public static Item.Settings settings = new Item.Settings().component(DataComponentTypes.MAX_STACK_SIZE, 1).component(DataComponentTypes.LORE, new LoreComponent(List.of(Text.literal("Right click a cutscene node to create a new node.").fillStyle(style), Text.literal("Right click + crouch a cutscene node to delete it.").fillStyle(style), Text.literal("Scroll while selecting a cutscene node to push/pull.").fillStyle(style), Text.literal("Holding this item will allow you to see cutscene paths.").fillStyle(style), Text.literal("Use \"/cutscene\" to create and manage cutscenes.").fillStyle(style))));
 	public static RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "editor"));
 	public static Item editorItem = (Item)factory.apply(settings.registryKey(key));
 
