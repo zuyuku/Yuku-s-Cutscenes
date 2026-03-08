@@ -1,17 +1,18 @@
 {
 	"schemaVersion": 1,
 	"id": "yukuscutscenes",
-	"version": "${version}",
-	"name": "YukusCutscenes",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"version": "1.0.0-alpha",
+	"name": "Yuku's Cutscenes",
+	"description": "Adds camera-control cutscenes and screen transitions. Managed with \"/cutscene\" and \"/screeneffect\" commands.\nAlso adds and editor item that can be used to view and modify cutscene paths.",
 	"authors": [
-		"Me!"
+		"zuyuku_"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/yukus-cutscenes",
+		"issues": "https://github.com/zuyuku/Yuku-s-Cutscenes/issues",
+		"sources": "https://github.com/zuyuku/Yuku-s-Cutscenes"
 	},
-	"license": "CC0-1.0",
+	"license": "ARR",
 	"icon": "assets/yukuscutscenes/icon.png",
 	"environment": "*",
 	"entrypoints": {
