@@ -15,7 +15,8 @@ public class ServerCutsceneManager {
             ArrayList<Integer> tickLengths = playerTracker.get(player);
             if(tickLengths.isEmpty()) {
                 playerTracker.remove(player);
-                player.setInvulnerable(false);
+                if(!ServerScreenEffectManager.inScreenEffect(player))
+                    player.setInvulnerable(false);
                 return;
             }
             if(player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)
@@ -24,6 +25,10 @@ public class ServerCutsceneManager {
             if (tickLengths.get(0) <= 0) 
                 tickLengths.removeFirst();
         }
+    }
+
+    public static boolean inCutscene(ServerPlayerEntity player) {
+        return playerTracker.get(player) != null;
     }
 
     public static void addInstance(ServerPlayerEntity player, int ticks) {

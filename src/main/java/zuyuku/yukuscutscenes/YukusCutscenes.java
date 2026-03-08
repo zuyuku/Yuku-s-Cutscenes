@@ -31,6 +31,7 @@ import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
 import zuyuku.yukuscutscenes.util.ScreenEffectPayload;
 import zuyuku.yukuscutscenes.util.ServerCutsceneManager;
+import zuyuku.yukuscutscenes.util.ServerScreenEffectManager;
 
 public class YukusCutscenes implements ModInitializer {
 	public static final String MOD_ID = "yukuscutscenes";
@@ -47,6 +48,7 @@ public class YukusCutscenes implements ModInitializer {
 	public void onInitialize() {
 		Registry.register(Registries.ITEM, key, editorItem);
 		ServerTickEvents.START_SERVER_TICK.register(ServerCutsceneManager::tick);
+		ServerTickEvents.START_SERVER_TICK.register(ServerScreenEffectManager::tick);
 		initializePayloads();
 		initializeCommands();
 	}
