@@ -18,6 +18,7 @@ import net.minecraft.command.argument.TimeArgumentType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Uuids;
@@ -25,6 +26,7 @@ import zuyuku.yukuscutscenes.util.Cutscene;
 import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
 import zuyuku.yukuscutscenes.util.LerpType;
+import zuyuku.yukuscutscenes.util.ServerCutsceneManager;
 import zuyuku.yukuscutscenes.util.bezier.BezierPath;
 
 public class CutsceneCommand {
@@ -122,9 +124,12 @@ public class CutsceneCommand {
                                                 NbtCompound nbt = new NbtCompound();
                                                 nbt.putString("PlayName", name);
                                                 nbt.putString("LerpType", lerpType.name());
-                                                nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
-                                                ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                int length = IntegerArgumentType.getInteger(context, "length");
+                                                nbt.putInt("Length", length);
+                                                ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                                manager.syncToPlayer(player);
+                                                ServerCutsceneManager.addInstance(player, length);
+                                                ServerPlayNetworking.send(player, new CutscenePayload(nbt));
                                                 return 1;
                                             })
                                             .then(
@@ -145,10 +150,20 @@ public class CutsceneCommand {
                                                         NbtCompound nbt = new NbtCompound();
                                                         nbt.putString("PlayName", name);
                                                         nbt.putString("LerpType", lerpType.name());
-                                                        nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                        nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                        manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
-                                                        ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+
+                                                        int length = IntegerArgumentType.getInteger(context, "length");
+                                                        nbt.putInt("Length", length);
+
+                                                        int hold = IntegerArgumentType.getInteger(context, holdType.get(0));
+                                                        nbt.putInt(holdType.get(0), hold);
+
+                                                        length += hold;
+
+                                                        ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                                        manager.syncToPlayer(player);
+
+                                                        ServerCutsceneManager.addInstance(player, length);
+                                                        ServerPlayNetworking.send(player, new CutscenePayload(nbt));
                                                         return 1;
                                                     })
                                                     .then(
@@ -169,11 +184,22 @@ public class CutsceneCommand {
                                                                 NbtCompound nbt = new NbtCompound();
                                                                 nbt.putString("PlayName", name);
                                                                 nbt.putString("LerpType", lerpType.name());
-                                                                nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                                nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                                nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
-                                                                manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
-                                                                ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+
+                                                                int length = IntegerArgumentType.getInteger(context, "length");
+                                                                nbt.putInt("Length", length);
+
+                                                                int hold = IntegerArgumentType.getInteger(context, holdType.get(0));
+                                                                nbt.putInt(holdType.get(0), hold);
+                                                                length += hold;
+
+                                                                hold = IntegerArgumentType.getInteger(context, holdType.get(1));
+                                                                nbt.putInt(holdType.get(1), hold);
+                                                                length += hold;
+
+                                                                ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                                                manager.syncToPlayer(player);
+                                                                ServerCutsceneManager.addInstance(player, length);
+                                                                ServerPlayNetworking.send(player, new CutscenePayload(nbt));
                                                                 return 1;
                                                             })
                                                             .then(
@@ -190,15 +216,27 @@ public class CutsceneCommand {
                                                                         return 0;
                                                                     }
                                                                     NbtCompound nbt = new NbtCompound();
-                                                                    UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
                                                                     nbt.putString("PlayName", name);
                                                                     nbt.putString("LerpType", lerpType.name());
-                                                                    nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
-                                                                    nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
-                                                                    nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
+
+                                                                    int length = IntegerArgumentType.getInteger(context, "length");
+                                                                    nbt.putInt("Length", length);
+
+                                                                    int hold = IntegerArgumentType.getInteger(context, holdType.get(0));
+                                                                    nbt.putInt(holdType.get(0), hold);
+                                                                    length += hold;
+
+                                                                    hold = IntegerArgumentType.getInteger(context, holdType.get(1));
+                                                                    nbt.putInt(holdType.get(1), hold);
+                                                                    length += hold;
+
+                                                                    UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
                                                                     nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, playerUuid);
-                                                                    manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
-                                                                    ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+
+                                                                    ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                                                    manager.syncToPlayer(player);
+                                                                    ServerCutsceneManager.addInstance(player, length);
+                                                                    ServerPlayNetworking.send(player, new CutscenePayload(nbt));
                                                                     return 1;
                                                                 })
                                                                 .then(
@@ -215,16 +253,30 @@ public class CutsceneCommand {
                                                                             return 0;
                                                                         }
                                                                         NbtCompound nbt = new NbtCompound();
-                                                                        UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
                                                                         nbt.putString("PlayName", name);
                                                                         nbt.putString("LerpType", lerpType.name());
-                                                                        nbt.putInt("Length", IntegerArgumentType.getInteger(context, "length"));
+
+                                                                        int length = IntegerArgumentType.getInteger(context, "length");
+                                                                        nbt.putInt("Length", length);
+
+                                                                        int hold = IntegerArgumentType.getInteger(context, holdType.get(0));
+                                                                        nbt.putInt(holdType.get(0), hold);
+                                                                        length += hold;
+
+                                                                        hold = IntegerArgumentType.getInteger(context, holdType.get(1));
+                                                                        nbt.putInt(holdType.get(1), hold);
+                                                                        length += hold;
+
+                                                                        UUID playerUuid = EntityArgumentType.getPlayer(context, "player").getUuid();
                                                                         nbt.putInt(holdType.get(0), IntegerArgumentType.getInteger(context, holdType.get(0)));
                                                                         nbt.putInt(holdType.get(1), IntegerArgumentType.getInteger(context, holdType.get(1)));
                                                                         nbt.put(anchorType.get(0), Uuids.INT_STREAM_CODEC, playerUuid);
                                                                         nbt.put(anchorType.get(1), Uuids.INT_STREAM_CODEC, playerUuid);
-                                                                        manager.syncToPlayer(EntityArgumentType.getPlayer(context, "player"));
-                                                                        ServerPlayNetworking.send(EntityArgumentType.getPlayer(context, "player"), new CutscenePayload(nbt));
+                                                                        
+                                                                        ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                                                        manager.syncToPlayer(player);
+                                                                        ServerCutsceneManager.addInstance(player, length);
+                                                                        ServerPlayNetworking.send(player, new CutscenePayload(nbt));
                                                                         return 1;
                                                                     })
                                                                 )

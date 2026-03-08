@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.Context;
@@ -29,6 +30,7 @@ import zuyuku.yukuscutscenes.item.EditorItem;
 import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
 import zuyuku.yukuscutscenes.util.ScreenEffectPayload;
+import zuyuku.yukuscutscenes.util.ServerCutsceneManager;
 
 public class YukusCutscenes implements ModInitializer {
 	public static final String MOD_ID = "yukuscutscenes";
@@ -44,6 +46,7 @@ public class YukusCutscenes implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(Registries.ITEM, key, editorItem);
+		ServerTickEvents.START_SERVER_TICK.register(ServerCutsceneManager::tick);
 		initializePayloads();
 		initializeCommands();
 	}
