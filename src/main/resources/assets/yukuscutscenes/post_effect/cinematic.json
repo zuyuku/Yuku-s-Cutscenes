@@ -5,7 +5,7 @@
     "passes": [
         {
             "vertex_shader": "minecraft:core/screenquad",
-            "fragment_shader": "yukuscutscenes:post/star_round",
+            "fragment_shader": "yukuscutscenes:post/cinematic",
             "inputs": [
                 {
                     "sampler_name": "In",
