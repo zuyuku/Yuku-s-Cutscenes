@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "yukuscutscenes",
-	"version": "1.0.0-alpha",
+	"version": "1.0.1-alpha",
 	"name": "Yuku's Cutscenes",
 	"description": "Adds camera-control cutscenes and screen transitions. Managed with \"/cutscene\" and \"/screeneffect\" commands.\nAlso adds and editor item that can be used to view and modify cutscene paths.",
 	"authors": [
