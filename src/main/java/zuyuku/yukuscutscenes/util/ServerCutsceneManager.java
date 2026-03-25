@@ -27,6 +27,12 @@ public class ServerCutsceneManager {
         }
     }
 
+    public static void cancelCutscene(ServerPlayerEntity player) {
+        if(!inCutscene(player))
+            return;
+        playerTracker.get(player).removeFirst();
+    }
+
     public static boolean inCutscene(ServerPlayerEntity player) {
         return playerTracker.get(player) != null;
     }

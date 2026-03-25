@@ -44,6 +44,20 @@ public class ClientCutsceneManager implements ClientModInitializer {
 
          ClientPlayNetworking.registerGlobalReceiver(CutscenePayload.ID, (payload, context) -> {
             context.client().execute(() -> {
+                boolean cancel = payload.nbt().getBoolean("Cancel", false);
+                if(cancel) {
+                    if(cutsceneQueue.isEmpty()) {
+                        currentCutscene = null;
+                        currentLengthInTicks = 0;
+                        holdTimeEnd = 0;
+                        holdTimeStart = 0;
+                        if(!ClientScreenEffectManager.inScreenEffect())
+                            MC.options.hudHidden = false;
+                        return;
+                    }
+                    setCutscene(cutsceneQueue.getFirst());
+                    return;
+                }
                 String name = payload.nbt().getString("PlayName", "NULLNULL");
                 if(!name.matches("NULLNULL")) {
                     for(Cutscene cutscene : CurveRenderer.cutscenes)
@@ -80,6 +94,8 @@ public class ClientCutsceneManager implements ClientModInitializer {
             setCutscene(cutsceneQueue.getFirst());
         }
         currentAgeInTicks += MC.getRenderTickCounter().getDynamicDeltaTicks();
+        if(!inCutscene())
+            return;
         float t = Math.clamp((currentAgeInTicks-holdTimeStart)/currentLengthInTicks, 0f, 1f);
         pos = currentCutscene.getPosAt(currentLerpType.compute(t));
         rot = currentCutscene.getRotAt(currentLerpType.compute(t));

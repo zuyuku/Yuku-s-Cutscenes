@@ -59,6 +59,25 @@ public class CutsceneCommand {
                             )
                         )
                         .then(
+                            CommandManager.literal("cancel")
+                            .then(
+                                CommandManager.argument("player", EntityArgumentType.player())
+                                .executes(context -> {
+                                    ServerCommandSource source = context.getSource();
+                                    ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+                                    if(!ServerCutsceneManager.inCutscene(player)) {
+                                        source.sendError(Text.of(player.getName().getString() + " is not viewing any cutscenes."));
+                                        return 0;
+                                    }
+                                    NbtCompound nbt = new NbtCompound();
+                                    nbt.putBoolean("Cancel", true);
+                                    ServerPlayNetworking.send(player, new CutscenePayload(nbt));
+                                    ServerCutsceneManager.cancelCutscene(player);
+                                    return 1;
+                                })
+                            )
+                        )
+                        .then(
                             CommandManager.literal("linearize")
                             .then(
                                 CommandManager.argument("name", IdentifierArgumentType.identifier())
