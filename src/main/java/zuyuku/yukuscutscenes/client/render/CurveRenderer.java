@@ -30,7 +30,7 @@ public class CurveRenderer implements ClientModInitializer {
             for(Cutscene cutscene : cutscenes)
                 cutscene.render(context);
             if(storedPoint != null) {
-                MC.player.sendMessage(Text.of("Scroll to push/pull points."), true);
+                MC.player.sendMessage(Text.of("Scroll to push/pull points.    Current distance from camera: " + String.valueOf(storedDistance)), true);
                 storedPoint.setPos(calculateNewPoint(MC.player));
                 for(Cutscene cutscene : cutscenes)
                     for(BezierPoint nearPoint : cutscene.path.getPoints())
