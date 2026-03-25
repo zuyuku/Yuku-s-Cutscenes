@@ -22,6 +22,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Vec3d;
 import zuyuku.yukuscutscenes.util.Cutscene;
 import zuyuku.yukuscutscenes.util.CutsceneManager;
 import zuyuku.yukuscutscenes.util.CutscenePayload;
@@ -53,6 +54,46 @@ public class CutsceneCommand {
                                     manager.setData(new NbtCompound());
                                     manager.syncToClients(source.getWorld());
                                     source.sendFeedback(() -> Text.literal("All cutscenes have been removed from world."), true);
+                                    return 1;
+                                })
+                            )
+                        )
+                        .then(
+                            CommandManager.literal("linearize")
+                            .then(
+                                CommandManager.argument("name", IdentifierArgumentType.identifier())
+                                .suggests(SUGGESTION_PROVIDER)
+                                .executes(context -> {
+                                    ServerCommandSource source = context.getSource();
+                                    String name = IdentifierArgumentType.getIdentifier(context, "name").getPath();
+                                    CutsceneManager manager = CutsceneManager.getFromWorld(source.getWorld());
+                                    ArrayList<Cutscene> cutscenes = manager.getCutscenes();
+                                    Cutscene cutscene = null;
+                                    for(Cutscene testAgainst : cutscenes)
+                                        if(testAgainst.getName().matches(name)) {
+                                            cutscene = testAgainst;
+                                            break;
+                                        }
+                                    if(cutscene == null) {
+                                        source.sendError(Text.of("Cutscene of name [" + name + "] not found."));
+                                        return 0;
+                                    }
+                                    BezierPath path = cutscene.path;
+                                    if(path.getPoints().size()>4) {
+                                        source.sendError(Text.of("This cutscene has more than 2 path nodes."));
+                                        return 0;
+                                    }
+                                    if(path.getPoints().size()<4) {
+                                        source.sendError(Text.of("This cutscene has less than 2 path nodes."));
+                                        return 0;
+                                    }
+                                    Vec3d p2 = path.getPoints().getLast().getPos();
+                                    Vec3d newTangent = p2.add(path.getPoints().getFirst().getPos().subtract(p2).multiply(0.5));
+                                    path.getPoints().get(1).setPos(newTangent);
+                                    path.getPoints().get(2).setPos(newTangent);
+                                    manager.setList(cutscenes);
+                                    manager.syncToClients(source.getWorld());
+                                    source.sendFeedback(() -> Text.literal("Cutscene [" + name + "] has been linearized."), false);
                                     return 1;
                                 })
                             )
